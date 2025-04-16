@@ -1,4 +1,6 @@
 from setuptools import find_packages, setup
+import os
+from glob import glob
 
 package_name = 'end_effector_tracking'
 
@@ -10,6 +12,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        (os.path.join('share',package_name,'launch'), glob('launch/*'))
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -20,8 +23,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'camera_pub = end_effector_tracking.camera_pub:main',
+            'dummy_camera_pub = end_effector_tracking.dummy_camera_pub:main',
             'aruco_tracker = end_effector_tracking.aruco_tracker:main',
+            'plot_ee_position = end_effector_tracking.plot_ee_position:main',
         ],
     },
 )
