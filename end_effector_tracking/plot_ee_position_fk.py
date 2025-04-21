@@ -21,14 +21,14 @@ class PosePlotter(Node):
         self.y_window = deque(maxlen=self.window_size)
         self.z_window = deque(maxlen=self.window_size)
 
-        self.create_subscription(Float64MultiArray, '/ur/ee_pose_aruco', self.pose_callback, 10)
+        self.create_subscription(Float64MultiArray, '/ur/ee_pose', self.pose_callback, 10)
         self.get_logger().info("PosePlotter node started.")
 
     def pose_callback(self, msg):
         if len(msg.data) >= 6:
             x = msg.data[3]
-            z = msg.data[4]
-            y = msg.data[5]
+            y = msg.data[4]
+            z = msg.data[5]
 
             self.x_window.append(x)
             self.y_window.append(y)
@@ -60,7 +60,7 @@ def main():
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
-    ax.set_title("Aruco: Live 3D Smoothed End Effector Trajectory")
+    ax.set_title("FK: Live 3D Smoothed End Effector Trajectory")
     ax.legend()
 
     try:

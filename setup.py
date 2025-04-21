@@ -26,6 +26,7 @@ setup(
             'dummy_camera_pub = end_effector_tracking.dummy_camera_pub:main',
             'aruco_tracker = end_effector_tracking.aruco_tracker:main',
             'plot_ee_position = end_effector_tracking.plot_ee_position:main',
+            'plot_ee_position_fk = end_effector_tracking.plot_ee_position_fk:main',
         ],
     },
 )

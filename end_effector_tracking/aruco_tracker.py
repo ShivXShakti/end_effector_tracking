@@ -11,7 +11,7 @@ from std_msgs.msg import Float64MultiArray
 
 
 class ArucoTracker(Node):
-    def __init__(self, show_detection = False):
+    def __init__(self, show_detection = True):
         super().__init__('aruco_tracker_node')
         self.bridge = CvBridge()
         self.camera_matrix = None
@@ -20,14 +20,19 @@ class ArucoTracker(Node):
         self.show_detection = show_detection
         self.centroid_pub = self.create_publisher(Float64MultiArray, '/ur/ee_pose_aruco', 10)
 
+        self.create_subscription(Image, '/robot1/D435_1/aligned_depth_to_color/image_raw', self.depth_callback, 10)
+        self.create_subscription(CameraInfo, '/robot1/D435_1/aligned_depth_to_color/camera_info', self.camera_info_callback, 10)
         self.create_subscription(Image, '/robot1/D435_1/color/image_raw', self.image_callback, 10)
-        self.create_subscription(CameraInfo, '/robot1/D435_1/color/camera_info', self.camera_info_callback, 10)
+        #self.create_subscription(CameraInfo, '/robot1/D435_1/color/camera_info', self.camera_info_callback, 10)
 
     def camera_info_callback(self, msg):
         if self.camera_matrix is None:
             self.camera_matrix = np.array(msg.k).reshape(3, 3)
             self.dist_coeffs = np.array(msg.d)
             self.get_logger().info("Camera parameters received.")
+    def depth_callback(self, msg):
+        """Convert depth image from ROS2 message to OpenCV format"""
+        self.depth_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='16UC1')
 
     def image_callback(self, msg):
         if self.camera_matrix is None:
@@ -51,9 +56,29 @@ class ArucoTracker(Node):
                 cv2.circle(cv_image, (cx, cy), 5, (0, 255, 0), -1)
                 cv2.putText(cv_image, f'ID {ids[i][0]}', (cx + 10, cy),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 255), 1, cv2.LINE_AA)
+                
+                depth_img = self.depth_image
+                Z = depth_img[cy, cx] * 0.001  # Depth in mm
+                if Z == 0:  # Ignore invalid depth points
+                    self.get_logger().warn("Invalid depth at selected point!")
+                    return
 
+                # Convert to 3D coordinates
+                X = (cx - self.camera_matrix[0, 2]) * Z / self.camera_matrix[0, 0]
+                Y = (cy - self.camera_matrix[1, 2]) * Z / self.camera_matrix[1, 1]
+                print(f"xyz: {X, Y, Z}")
+
+                """TWC = np.array([[1,0,0, 0.400],
+                        [0,0,-1, 1.000],
+                        [0,-1,0,0.110],
+                        [0,0,0,1]])
+                poc = np.array([X, Y, Z, 1]).reshape(4,1)
+                p = TWC@poc
+                #labels.append(class_name)
+                #detected_objs.append(p.flatten())
+                p = p.flatten()"""
                 centroid_msg = Float64MultiArray()
-                centroid_msg.data = [0.0,0.0,0.0,float(cx),float(cy),0.0]
+                centroid_msg.data = [0.0,0.0,0.0,X,Y,Z]
                 self.centroid_pub.publish(centroid_msg)
 
         else:
