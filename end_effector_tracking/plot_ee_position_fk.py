@@ -16,19 +16,20 @@ class PosePlotter(Node):
         self.z_vals = []
 
         # Smoothing buffer
-        self.window_size = 5  # Adjust as needed
+        self.window_size = 20  # Adjust as needed
         self.x_window = deque(maxlen=self.window_size)
         self.y_window = deque(maxlen=self.window_size)
         self.z_window = deque(maxlen=self.window_size)
 
-        self.create_subscription(Float64MultiArray, '/ur/ee_pose', self.pose_callback, 10)
+        self.create_subscription(Float64MultiArray, '/fk/left_right/ee_pose', self.fk_pose_callback, 10)
+        self.create_subscription(Float64MultiArray, '/desired/left_right/ee_pose', self.desired_pose_callback, 10)
         self.get_logger().info("PosePlotter node started.")
 
-    def pose_callback(self, msg):
+    def fk_pose_callback(self, msg):
         if len(msg.data) >= 6:
-            x = msg.data[3]
-            y = msg.data[4]
-            z = msg.data[5]
+            x = msg.data[0]
+            y = msg.data[1]
+            z = msg.data[2]
 
             self.x_window.append(x)
             self.y_window.append(y)
@@ -52,7 +53,7 @@ def main():
 
     # Enable interactive mode
     plt.ion()
-    fig = plt.figure()
+    fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(111, projection='3d')
 
     # Initialize empty plot
@@ -63,9 +64,13 @@ def main():
     ax.set_title("FK: Live 3D Smoothed End Effector Trajectory")
     ax.legend()
 
+    ax.set_xlim([-1, 5])  # Set X axis limits
+    ax.set_ylim([-3, 3])  # Set Y axis limits
+    ax.set_zlim([-3, 1])   # Set Z axis limits
+
     try:
         while rclpy.ok():
-            rclpy.spin_once(node, timeout_sec=0.1)
+            rclpy.spin_once(node, timeout_sec=0.01)
 
             if node.x_vals:
                 trajectory.set_data(node.x_vals, node.y_vals)
