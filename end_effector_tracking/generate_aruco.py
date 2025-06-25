@@ -157,7 +157,7 @@ detector = cv2.aruco.ArucoDetector(dictionary, parameters)
 corners, ids, _ = detector.detectMarkers(gray)
 
 if ids is not None:
-    print(f"✅ Detected marker IDs: {ids.flatten()}")
+    print(f"Detected marker IDs: {ids.flatten()}")
     cv2.aruco.drawDetectedMarkers(image, corners, ids)
 
     for marker_corners in corners:
@@ -167,7 +167,7 @@ if ids is not None:
         print(f"Centroid: ({cx}, {cy})")
         cv2.circle(image, (cx, cy), 5, (0, 255, 0), -1)
 else:
-    print("❌ No markers detected.")
+    print("No markers detected.")
 
 cv2.imshow("Marker Detection", image)
 cv2.waitKey(0)

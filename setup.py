@@ -23,12 +23,10 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'dummy_camera_pub = end_effector_tracking.dummy_camera_pub:main',
             'aruco_tracker = end_effector_tracking.aruco_tracker:main',
-            'msg_test = end_effector_tracking.msg_test:main',
-            'plot_ee_position = end_effector_tracking.plot_ee_position:main',
-            'plot_ee_position_fk = end_effector_tracking.plot_ee_position_fk:main',
-            'ee_pose_data_plot = end_effector_tracking.ee_pose_data_plot:main',
+            'plot_ee_pose_aruco = end_effector_tracking.plot_ee_pose_aruco:main',
+            'liveplot_ee_position_fk = end_effector_tracking.liveplot_ee_position_fk:main',
+            'ee_pose_savedata_plot = end_effector_tracking.ee_pose_savedata_plot:main',
         ],
     },
 )
