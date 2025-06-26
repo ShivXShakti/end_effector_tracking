@@ -62,7 +62,7 @@ class ArucoTracker(Node):
                     ptsl = marker_corners_l[0]
                     cxl = int(np.mean(ptsl[:, 0]))
                     cyl = int(np.mean(ptsl[:, 1]))
-                    self.get_logger().info(f"Marker {ids_l[i][0]} centroid: ({cxl}, {cyl})")
+                    #self.get_logger().info(f"Marker {ids_l[i][0]} centroid: ({cxl}, {cyl})")
 
                     cv2.circle(cv_image, (cxl, cyl), 5, (0, 255, 0), -1)
                     cv2.putText(cv_image, f'ID {ids_l[i][0]}', (cxl + 10, cyl),
@@ -76,12 +76,12 @@ class ArucoTracker(Node):
                     # Convert to 3D coordinates
                     Xl = (cxl - self.camera_matrix[0, 2]) * Zl / self.camera_matrix[0, 0]
                     Yl = (cyl - self.camera_matrix[1, 2]) * Zl / self.camera_matrix[1, 1]
-                    print(f"xyz: {Xl, Yl, Zl}")
+                    #print(f"xyz: {Xl, Yl, Zl}")
 
                     ptsr = marker_corners_r[0]
                     cxr = int(np.mean(ptsr[:, 0]))
                     cyr = int(np.mean(ptsr[:, 1]))
-                    self.get_logger().info(f"Marker {ids_r[i][0]} centroid: ({cxr}, {cyr})")
+                    #self.get_logger().info(f"Marker {ids_r[i][0]} centroid: ({cxr}, {cyr})")
 
                     cv2.circle(cv_image, (cxr, cyr), 5, (0, 255, 0), -1)
                     cv2.putText(cv_image, f'ID {ids_r[i][0]}', (cxr + 10, cyr),
@@ -95,7 +95,7 @@ class ArucoTracker(Node):
                     # Convert to 3D coordinates
                     Xr = (cxr - self.camera_matrix[0, 2]) * Zr / self.camera_matrix[0, 0]
                     Yr = (cyr - self.camera_matrix[1, 2]) * Zr / self.camera_matrix[1, 1]
-                    print(f"xyz: {Xr, Yr, Zr}")
+                    #print(f"xyz: {Xr, Yr, Zr}")
                     
                     centroid_msg = Float64MultiArray()
                     centroid_msg.data = [Xl,Yl,Zl,Xr,Yr,Zr]

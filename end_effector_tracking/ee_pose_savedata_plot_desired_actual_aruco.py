@@ -5,15 +5,16 @@ import csv
 import matplotlib.pyplot as plt
 import time
 from dualarm_custom_msgs.msg import TrajStatus      # Custom message
+from std_msgs.msg import Float64MultiArray
 
 
 
 class PoseSubscriber(Node):
-    def __init__(self, aruco_plot_f=False, fk_plot_f=True, desired_plot_f=True):
+    def __init__(self, aruco_plot_f=True, fk_plot_f=False, desired_plot_f=False):
         super().__init__('ee_sub')
         self.create_subscription(TrajStatus, '/fk/left_right/ee_pose', self.fk_ee_callback, 10)
         self.create_subscription(TrajStatus, '/desired/left_right/ee_pose', self.desired_ee_callback, 10)
-        self.create_subscription(TrajStatus, '/aruco/left_right/ee_pose', self.aruco_ee_callback, 10)
+        self.create_subscription(Float64MultiArray, '/aruco/left_right/ee_pose', self.aruco_ee_callback, 10)
 
         self.create_timer(2, self.timer_callback) # 2sec
 
@@ -82,21 +83,21 @@ class PoseSubscriber(Node):
         self.xar_data.append(msg.data.data[6])
         self.yar_data.append(msg.data.data[7])
         self.zar_data.append(msg.data.data[8])
-        self.get_logger().info(f"fk saved pose: {msg.data.data}")
+        #self.get_logger().info(f"fk saved pose: {msg.data.data}")
 
     def aruco_ee_callback(self, msg):
         self.aruco_ee_pose_f = True
-        self.aruco_pose_ee_status = msg.status
+        #self.aruco_pose_ee_status = msg.status
         with open(self.file_path_aruco, mode='a', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(msg.data.data)
-        self.xaml_data.append(msg.data.data[0])
-        self.yaml_data.append(msg.data.data[1])
-        self.zaml_data.append(msg.data.data[2])
-        self.xamr_data.append(msg.data.data[3])
-        self.yamr_data.append(msg.data.data[4])
-        self.zamr_data.append(msg.data.data[5])
-        self.get_logger().info(f"fk saved pose: {msg.data.data}")
+            writer.writerow(msg.data)
+        self.xaml_data.append(msg.data[0])
+        self.yaml_data.append(msg.data[1])
+        self.zaml_data.append(msg.data[2])
+        self.xamr_data.append(msg.data[3])
+        self.yamr_data.append(msg.data[4])
+        self.zamr_data.append(msg.data[5])
+        #self.get_logger().info(f"aruco saved pose: {msg.data}")
     
     def desired_ee_callback(self, msg):
         self.desired_ee_pose_f = True
@@ -113,7 +114,7 @@ class PoseSubscriber(Node):
         
         self.t.append(self.counter)
         self.counter +=1
-        self.get_logger().info(f"desired saved pose: {msg.data.data}")
+        #self.get_logger().info(f"desired saved pose: {msg.data.data}")
 
 
     def plot_2d_data(self):
@@ -133,7 +134,7 @@ class PoseSubscriber(Node):
             ax5.plot(self.t, self.yar_data)
             ax6.plot(self.t, self.zar_data)
         if self.aruco_plot_f:
-            if len(self.xaml_data)>1:
+            if len(self.xaml_data)==len(self.t):
                 ax1.plot(self.t, self.xaml_data)
                 ax2.plot(self.t, self.yaml_data)
                 ax3.plot(self.t, self.zaml_data)
@@ -161,7 +162,6 @@ class PoseSubscriber(Node):
             ax.plot3D(self.xal_data,self.yal_data,self.zal_data, color='blue', linewidth=2)
         if self.desired_plot_f:
             ax.plot3D(self.xdl_data,self.ydl_data,self.zdl_data, color='red', linewidth=2)
-        
         plt.show()
 
     def timer_callback(self):
