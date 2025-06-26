@@ -7,6 +7,8 @@ import cv2.aruco as aruco
 from cv_bridge import CvBridge
 import numpy as np
 from std_msgs.msg import Float64MultiArray
+from dualarm_custom_msgs.msg import TrajStatus 
+
 
 
 
@@ -18,7 +20,7 @@ class ArucoTracker(Node):
         self.dist_coeffs = None
         self.tag_size = 0.1  # 5 cm
         self.show_detection = show_detection
-        self.centroid_pub = self.create_publisher(Float64MultiArray, '/ur/ee_pose_aruco', 10)
+        self.centroid_pub = self.create_publisher(Float64MultiArray, '/aruco/left_right/ee_pose', 10)
 
         self.create_subscription(Image, '/robot1/D435_1/aligned_depth_to_color/image_raw', self.depth_callback, 10)
         self.create_subscription(CameraInfo, '/robot1/D435_1/aligned_depth_to_color/camera_info', self.camera_info_callback, 10)

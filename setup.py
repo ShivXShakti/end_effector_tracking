@@ -24,6 +24,7 @@ setup(
     entry_points={
         'console_scripts': [
             'aruco_tracker = end_effector_tracking.aruco_tracker:main',
+            'camera_test = end_effector_tracking.camera_test:main',
             'multiple_aruco_tracker = end_effector_tracking.multiple_aruco_tracker:main',
             'plot_ee_pose_aruco = end_effector_tracking.plot_ee_pose_aruco:main',
             'liveplot_ee_position_fk = end_effector_tracking.liveplot_ee_position_fk:main',
